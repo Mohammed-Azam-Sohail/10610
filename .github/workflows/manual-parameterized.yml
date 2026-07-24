@@ -1,38 +1,46 @@
-name: manual-parameterized
+name: Parameterized Manual Workflow
+
 on:
-        workflow_dispatch:
-                inputs:
-                        application_name:
-                                type: string
-                                required: true
-                        run_validation:
-                                type: boolean
-                                required: true
+  workflow_dispatch:
+    inputs:
+      application_name:
+        description: "Name of the application"
+        required: true
+        type: string
+      run_validation:
+        description: "Run validation step?"
+        required: true
+        default: true
+        type: boolean
+
 jobs:
-        validate:
-                outputs:
-                        validate_status: ${{ steps.set-status.outputs.validate_status }}
-                runs-on: ubuntu-latest
-                steps:
-                      - name: inputs
-                        run: |
-                                echo "Application Name: ${{ inputs.application_name }}"
-                                echo "Run Validation: ${{ inputs.run_validation }}"
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      validation_status: ${{ steps.set-status.outputs.validation_status }}
 
-                      - name: set status
-                        id: set-status
-                        # Using GH expression syntax avoids string matching bugs in bash
-                        run: |
-                                if [ "${{ inputs.run_validation }}" = "true" ]; then
-                                        echo "validate_status=success" >> $GITHUB_OUTPUT
-                                else
-                                        echo "validate_status=skipped" >> $GITHUB_OUTPUT
-                                fi
+    steps:
+      - name: Print input values
+        run: |
+          echo "Application Name: ${{ inputs.application_name }}"
+          echo "Run Validation: ${{ inputs.run_validation }}"
 
-        summary:       
-                runs-on: ubuntu-latest
-                needs: validate
-                if: needs.validate.outputs.validate_status == 'success'
-                steps:
-                        - name: sum
-                          run: echo "summary"
+      - name: Set validation status
+        id: set-status
+        run: |
+          if [ "${{ inputs.run_validation }}" = "true" ]; then
+            echo "validation_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "validation_status=skipped" >> $GITHUB_OUTPUT
+          fi
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: validate
+    if: needs.validate.outputs.validation_status == 'success'
+
+    steps:
+      - name: Print execution summary
+        run: |
+          echo "Validation successful!"
+          echo "Application '${{ inputs.application_name }}' passed validation."
