@@ -19,8 +19,9 @@ jobs:
                                 echo "Application Name: ${{ inputs.application_name }}"
                                 echo "Run Validation: ${{ inputs.run_validation }}"
 
-                      - name: ste status
+                      - name: set status
                         id: set-status
+                        # Using GH expression syntax avoids string matching bugs in bash
                         run: |
                                 if [ "${{ inputs.run_validation }}" = "true" ]; then
                                         echo "validate_status=success" >> $GITHUB_OUTPUT
