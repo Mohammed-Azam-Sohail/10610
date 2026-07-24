@@ -26,8 +26,12 @@ jobs:
                                         echo "validate_status=success" >> $GITHUB_OUTPUT
                                 else
                                         echo "validate_status=skipped" >> $GITHUB_OUTPUT
-                                fi 
-                      - name: summary
-                        needs: validate
-                        if: outputs.validate_status == 'success'
-                        run: echo "summary"
+                                fi
+
+        summary:       
+                runs-on: ubuntu-latest
+                needs: validate
+                if: outputs.validate_status == 'success'
+                steps:
+                        - name: sum
+                          run: echo "summary"
