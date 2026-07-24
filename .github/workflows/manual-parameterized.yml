@@ -11,7 +11,7 @@ on:
 jobs:
         validate:
                 outputs:
-                        validate_status: ${{ steps.set-status.validate_status }}
+                        validate_status: ${{ steps.set-status.outputs.validate_status }}
                 runs-on: ubuntu-latest
                 steps:
                       - name: inputs
